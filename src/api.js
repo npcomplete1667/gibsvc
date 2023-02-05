@@ -68,7 +68,7 @@ app.get('/users/:id', async (req, resp) => {
 app.put('/users/:id', async (req, resp) => {
     try {
         const userId = req.params.id
-        const result = await User.replaceOne({ _id: userId }, req.body, {new:true})
+        const result = await User.replaceOne({ _id: userId }, req.body, { new: true })
         console.log(result)
         resp.json({ updatedCount: result.modifiedCount })
 
@@ -81,9 +81,9 @@ app.put('/users/:id', async (req, resp) => {
 app.patch('/users/:id', async (req, resp) => {
     try {
         const userId = req.params.id
-        const result = await User.findOneAndUpdate({ _id: userId }, req.body, {new:true})
+        const result = await User.findOneAndUpdate({ _id: userId }, req.body, { new: true })
         console.log(result)
-        resp.json({result})
+        resp.json({ result })
 
     } catch (e) {
         resp.status(500).json({ error: e.message })
@@ -105,6 +105,23 @@ app.delete('/users/:id', async (req, resp) => {
 app.post('/add-user', async (req, resp) => {
     console.log(req.body)
     const user = new User(req.body)
+    try {
+        await user.save();
+        //201 is the status code for created
+        resp.status(201).json({ user })
+    } catch (e) {
+        //invalid input
+        resp.status(400).json({ error: e.message })
+    }
+})
+
+
+app.post('/test-add-user', async (req, resp) => {
+
+    const user = new User({
+        first_name: "direct test",
+        last_name: "to test db"
+    })
     try {
         await user.save();
         //201 is the status code for created
