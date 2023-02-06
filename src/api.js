@@ -45,14 +45,8 @@ app.get('/users', async (req, resp) => {
 
 app.get('/users/:id', async (req, resp) => {
     try {
-        console.log({
-            requestParams: req.params,
-            requestQuery: req.query
-        })
         const userId = req.params.id
-        console.log(userId)
         const user = await User.findById(userId)
-        console.log(user)
 
         if (!user) {
             resp.status(404).json({ error: "User not found" })
