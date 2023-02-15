@@ -123,6 +123,16 @@ app.post('/add-np-user', async (req, resp) => {
     }
 })
 
+app.get('/npusers', async (req, resp) => {
+    try {
+        const result = await npUser.find()
+        resp.send({ "users": result })
+    } catch (e) {
+        resp.status(500).json({ error: e.message })
+    }
+
+});
+
 
 app.post('/test-add-user', async (req, resp) => {
 
