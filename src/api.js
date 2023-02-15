@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import User from './schemas/user.js'
 import dotenv from 'dotenv'
 import cors from 'cors'
+import npUser from './schemas/np-user.js';
 
 if (process.env.NODE_ENV !== 'production') {
     dotenv.config();
@@ -99,6 +100,19 @@ app.delete('/users/:id', async (req, resp) => {
 app.post('/add-user', async (req, resp) => {
     console.log(req.body)
     const user = new User(req.body)
+    try {
+        await user.save();
+        //201 is the status code for created
+        resp.status(201).json({ user })
+    } catch (e) {
+        //invalid input
+        resp.status(400).json({ error: e.message })
+    }
+})
+
+app.post('/add-np-user', async (req, resp) => {
+    console.log(req.body)
+    const user = new npUser(req.body)
     try {
         await user.save();
         //201 is the status code for created
