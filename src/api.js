@@ -134,6 +134,18 @@ app.get('/npusers', async (req, resp) => {
 });
 
 
+app.delete('/npusers/:id', async (req, resp) => {
+    try {
+        const userId = req.params.id
+        const result = await npUser.deleteOne({ _id: userId })
+        resp.json({ deletedCount: result.deletedCount })
+
+    } catch (e) {
+        resp.status(500).json({ error: e.message })
+    }
+});
+
+
 app.post('/test-add-user', async (req, resp) => {
 
     const user = new User({
