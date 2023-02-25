@@ -1,2 +1,5 @@
-.env
+dev.env
+prod.env
 node_modules/
+db.js
+s3.js
