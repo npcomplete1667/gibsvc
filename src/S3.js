@@ -1,7 +1,7 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
-import Crypto from 'crypto'
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import ImageUtil from "./util/ImageUtil.js";
 
 export const S3 = new S3Client({
     region: process.env.S3_REGION,
@@ -12,7 +12,7 @@ export const S3 = new S3Client({
 })
 
 export async function sendFileToServer(fileBuffer, fileType) {
-    const fileName = generateFileName()
+    const fileName = ImageUtil.generateFileName()
     const uploadParams = {
         Bucket: process.env.S3_BUCKET_NAME,
         Body: fileBuffer,
@@ -25,21 +25,19 @@ export async function sendFileToServer(fileBuffer, fileType) {
     return fileName
 }
 
-async function getS3FileUrl(fileName) {
+export async function getS3FileUrl(fileName) {
     return await getSignedUrl(
         S3,
         new GetObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME,
             Key: fileName,
             expiresIn: 600,
-            ResponseContentDisposition: 'attachment; filename ="' + originalFilename + '"'
+            ResponseContentDisposition: 'attachment; filename ="profile_image.jpg"'
         })
     )
 }
 
 //helpers
-function generateFileName(bytes = 32) {
-    return Crypto.randomBytes(bytes).toString('hex')
-}
+
 
 

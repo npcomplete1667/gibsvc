@@ -1,26 +1,25 @@
 import { Router } from 'express'
-import AccountUserController from './Tables/account_users/controller.js'
-import NonAccountUserController from './Tables/non_account_users/controller.js'
+import Controller from './controller.js'
 import Multer from 'multer'
+import Query from './queries.js'
 
 const router = Router()
 const storage = Multer.memoryStorage()
 const upload = Multer({ storage: storage })
 
 
-//ROUTES ORDER: get, post, put, delete
-// router.get('/', AccountUserController.getAllUsers);
-// router.post('/', AccountUserController.addUser);
+router.post('/return-info-form', Controller.processReturnForm)
+router.get('/get-all-acc-users', Query.getAllAccUsers);
+router.post('/add-acc-user-info', upload.single('profile_image'), Query.addAccUserInfo);
+router.delete('/delete-acc-user/:acc_id', Query.deleteUser);
+router.get('/acc-user/:acc_id', Controller.getAccUserById);
+router.get('/get-user-connections/:acc_id', Query.getUserConnections);
 
-// router.get('/:id', AccountUserController.getUserById);
-// router.put('/:id', AccountUserController.updateUser);
-// router.delete('/:id', AccountUserController.deleteUser);
+router.delete('/delete-user-connection', Query.deleteUserConnection);
 
-//this is how you get files from a api req
-// router.post('/return-info-form', upload.single('profile_image'), Controller.processReturnForm)
 
-router.post('/return-info-form', NonAccountUserController.processReturnForm)
-router.get('/npusers', NonAccountUserController.getUserConnectionById)
+
+
 
 
 
