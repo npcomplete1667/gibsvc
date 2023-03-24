@@ -33,7 +33,7 @@ async function getAccUserById(req, res) {
     const user = await Queries.getUserById(acc_id)
     //at this point its an image_url but is put into the s3Key spot
     if (user.profile_image_s3_key)
-        user.profile_image_s3_key = await getS3FileUrl(user.profile_image_s3_key);
+        user.profile_image_url = await getS3FileUrl(user.profile_image_s3_key);
     user.links = await Queries.getUserLinks(acc_id)
 
     user.vCard = await addVCardToUser(user)
@@ -41,7 +41,7 @@ async function getAccUserById(req, res) {
 }
 
 async function addVCardToUser(user) {
-    const vCardImage = await makeVCardImage(user.profile_image_s3_key)
+    const vCardImage = await makeVCardImage(user.profile_image_url)
     let vCardLinks = []
     for (const link of user.links) {
         vCardLinks.push(`URL;TYPE=${link.name}:${link.url}`)
