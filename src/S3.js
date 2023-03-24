@@ -32,7 +32,7 @@ export async function getS3FileUrl(fileName) {
             Bucket: process.env.S3_BUCKET_NAME,
             Key: fileName,
             expiresIn: 600,
-            ResponseContentDisposition: 'attachment; filename ="profile_image.jpg"'
+            // ResponseContentDisposition: 'attachment; filename ="profile_image.jpg"'
         })
     )
 }
