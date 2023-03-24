@@ -27,26 +27,23 @@ async function processReturnForm(req, res) {
 }
 
 
-
-
 async function getAccUserById(req, res) {
     console.log('getting acc user by id')
     const acc_id = req.params.acc_id;
     const user = await Queries.getUserById(acc_id)
     //at this point its an image_url but is put into the s3Key spot
-    user.profile_image_s3_key = await getS3FileUrl(user.profile_image_s3_key);
+    if (user.profile_image_s3_key)
+        user.profile_image_s3_key = await getS3FileUrl(user.profile_image_s3_key);
     user.links = await Queries.getUserLinks(acc_id)
 
     user.vCard = await addVCardToUser(user)
     res.status(HTTP_RES_CODE.SUCCESS_OK).json(user)
 }
 
-
-
 async function addVCardToUser(user) {
     const vCardImage = await makeVCardImage(user.profile_image_s3_key)
     let vCardLinks = []
-    for (const link of user.links){
+    for (const link of user.links) {
         vCardLinks.push(`URL;TYPE=${link.name}:${link.url}`)
     }
     let vCard =

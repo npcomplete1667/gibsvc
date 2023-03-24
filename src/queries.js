@@ -26,7 +26,10 @@ const remove_acc_user = "DELETE from account_users WHERE acc_id = $1";
 
 const remove_acc_user_connections = "DELETE from user_connections WHERE user1_id = $1";
 
+const remove_acc_user_links = "DELETE from links WHERE acc_id = $1";
+
 const delete_non_acc_connection_of_acc_user = "DELETE from user_connections WHERE user1_id=$1 AND user2_id=$2 ";
+
 
 function getAllAccUsers(req, res) {
     console.log('getting all users')
@@ -34,7 +37,8 @@ function getAllAccUsers(req, res) {
         if (error) throw error;
         for (const element of query_results.rows) {
             console.log(element)
-            element.profile_image_s3_key = await getS3FileUrl(element.profile_image_s3_key)
+            if(element.profile_image_s3_key)
+                element.profile_image_s3_key = await getS3FileUrl(element.profile_image_s3_key)
         }
         res.status(HTTP_RES_CODE.SUCCESS_OK).json(query_results.rows);
     })
@@ -58,6 +62,16 @@ function getUserLinks(user_id){
     })
 }
 
+function getUserConnections(req, res) {
+    console.log('getting non acc users by acc id')
+    const acc_id = req.params.acc_id;
+    Pool.query(get_user_connection_by_id, [acc_id], (error, query_results) => {
+        if (error) throw error;
+        res.status(HTTP_RES_CODE.SUCCESS_OK).json(query_results.rows)
+    })
+}
+
+
 function phoneNumberExists(user) {
     let query = `SELECT u FROM ${user.table_name()} u WHERE u.phone_number=$1`
     return new Promise((resolve, reject) => {
@@ -71,6 +85,7 @@ function phoneNumberExists(user) {
         })
     })
 }
+
 
 async function addToDB(input) {
     console.log("Adding to table:", input.table_name(), '\n', input)
@@ -87,14 +102,6 @@ async function addToDB(input) {
     })
 }
 
-function getUserConnections(req, res) {
-    console.log('getting non acc users by acc id')
-    const acc_id = req.params.acc_id;
-    Pool.query(get_user_connection_by_id, [acc_id], (error, query_results) => {
-        if (error) throw error;
-        res.status(HTTP_RES_CODE.SUCCESS_OK).json(query_results.rows)
-    })
-}
 
 function deleteUserConnection(req, res) {
     const { acc_id, non_acc_id } = req.body;
@@ -109,24 +116,25 @@ function deleteUser(req, res) {
     })
     Pool.query(remove_acc_user_connections, [acc_id], (error) => {
         if (error) throw error;
+    })
+    Pool.query(remove_acc_user_links, [acc_id], (error) => {
+        if (error) throw error;
         res.status(HTTP_RES_CODE.SUCCESS_OK).send("User removed successfully!")
     })
+
 }
 
-async function addAccUserInfo(req, res) {
+async function addUserInfo(req, res) {
     console.log("adding user")
     let acc_user = new AccountUser(req);
-    console.log(acc_user)
-    console.log(req.file)
+    console.log("acc_user",acc_user)
+    console.log("req.file",req.file)
     if (acc_user.profile_image_s3_key) {
         const image_key = await ImageUtil.processImage(req).then(value => {
             return value
         })
 
         acc_user.profile_image_s3_key = image_key
-    }
-    else {
-        acc_user.profile_image_s3_key = "default_profile_image.jpg"
     }
 
 
@@ -175,7 +183,7 @@ export default {
     deleteUserConnection,
     deleteUser,
     updateUser,
-    addAccUserInfo,
+    addUserInfo,
     getUserById,
     getUserLinks
     // update_user,
