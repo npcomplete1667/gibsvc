@@ -1,10 +1,10 @@
 import { v4 as Uuidv4 } from 'uuid';
 class Link {
-    constructor(acc_id, link) {
+    constructor(user_id, link) {
         this.link_id = Uuidv4()
-        this.acc_id = acc_id
-        this.name = link.link_name
-        this.url = link.link_url
+        this.user_id = user_id
+        this.name = link.name
+        this.url = link.url
     }
 
     table_name() {

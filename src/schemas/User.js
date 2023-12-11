@@ -1,17 +1,18 @@
 import { v4 as Uuidv4 } from 'uuid';
-class AccountUser {
+class User {
     constructor(req) {
-        this.acc_id = Uuidv4()
-        this.profile_image_s3_key = req.file
+        this.user_id = req.params.user_id || Uuidv4()
         this.first_name = req.body.first_name
         this.last_name = req.body.last_name
         this.phone_number_country = req.body.phone_numberCountry
         this.phone_number = req.body.phone_number
+        this.email = req.body.email
+        this.has_account = req.body.has_account
     }
 
     table_name() {
-        return "account_users"
+        return "users"
     }
 }
 
-export default AccountUser
+export default User
