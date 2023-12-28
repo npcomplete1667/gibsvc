@@ -12,7 +12,9 @@ const router = Router()
 // })
 
 router.get('/', ((req, res) => { res.send("connected to api") }))
-router.post('/createSolTransferTransaction', Controller.processCreateSolTransferTransaction)
+router.post('/create-sol-transfer-transaction', Controller.processCreateSolTransferTransaction)
+router.post('/save-user', Controller.processSaveUser)
+
 
 
 

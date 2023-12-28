@@ -9,7 +9,8 @@ const router = Router();
 //     res.send(200)
 // })
 router.get('/', ((req, res) => { res.send("connected to api"); }));
-router.post('/createSolTransferTransaction', Controller.processCreateSolTransferTransaction);
+router.post('/create-sol-transfer-transaction', Controller.processCreateSolTransferTransaction);
+router.post('/save-user', Controller.processSaveUser);
 // router.post('/add-user-info', upload.single('profile_image'), Query.addUserInfo);
 // router.post('/update-user-info/:user_id', upload.single('profile_image'), Query.updateUser);
 // router.get('/all-account-users', Query.getAllAccountUsers);
