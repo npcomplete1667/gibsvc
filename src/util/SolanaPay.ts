@@ -35,6 +35,7 @@ const createSolTransferTransaction = async (from_wallet:string, to_wallet:string
         transaction.add(createSolTransferInstruction(from_wallet, to_wallet, amount, transactionReference))
     }
 
+
     // Serialize the transaction and convert to base64 to return it
     const serializedTransaction = transaction.serialize({
         // We will need the buyer to sign this transaction after it's returned to them
@@ -50,7 +51,7 @@ const createSolTransferInstruction = (from_wallet:string, to_wallet:string, amou
     console.log("SolanaPay: createSolTransferInstruction from_wallet=", from_wallet, " to_wallet=", to_wallet, ", amount=",amount)
     const fromWalletPubKey = new PublicKey(from_wallet)
     const toWalletPubKey = new PublicKey(to_wallet)
-    let bnAmount = new BigNumber(amount)
+    let bnAmount = new BigNumber(amount.toFixed(10))
 
     const transferInstruction = SystemProgram.transfer({
         fromPubkey: fromWalletPubKey,

@@ -10,6 +10,7 @@ import DB from '../db.js';
 import Account from '../schemas/Account.js';
 import Wallet from '../schemas/Wallet.js';
 import pool from "../AWS/Pool.js";
+import Transaction from '../schemas/Transaction.js';
 
 
 
@@ -52,6 +53,45 @@ const processSaveUser = async (request: Request, response: Response) =>  {
     }
 }
 
+const processSaveTransaction = async (request: Request, response: Response) =>  {
+    console.log("processSaveTransaction called with parameters: req.body=",request.body)
+
+    const [to_wallet, pay_dev] = await DB.getPubkeyFromUsername(request.body.to_username)
+    const usd_price = await DB.getTokenUsdPrice(request.body.token_account)
+    const transaction = new Transaction(request, to_wallet, usd_price);
+
+    try{
+        const [query, values] = DB.createAddToDBQuery(transaction)
+        pool.query(query, values)
+        response.status(HTTP_RES_CODE.SUCCESS_CREATED).send({"message": "Successfully Saved Transaction"})
+    } catch(e:any){
+        response.status(HTTP_RES_CODE.ERROR_BAD_REQUEST).send({"message":e.message});
+    }
+}
+
+const processGetTopSingleTransactions = async (request: Request, response: Response) =>  {
+    console.log("processGetTopSingleTransactions called with parameters: req.body=",request.body)
+    try{
+        const [to_wallet, pay_dev] = await DB.getPubkeyFromUsername(request.body.to_username)
+        const topSingles = await DB.getTopSingleTransactions(to_wallet, request.body.txn_type, request.body.limit)
+
+        response.status(HTTP_RES_CODE.SUCCESS_CREATED).send({"message": topSingles})
+    } catch(e:any){
+        response.status(HTTP_RES_CODE.ERROR_BAD_REQUEST).send({"message":e.message});
+    }
+}
+
+const processGetTopTotalTransactions = async (request: Request, response: Response) =>  {
+    console.log("processGetTopTotalTransactions called with parameters: req.body=",request.body)
+    try{
+        const [to_wallet, pay_dev] = await DB.getPubkeyFromUsername(request.body.to_username)
+        const topTotals = await DB.getTopTotalTransactions(to_wallet, request.body.txn_type, request.body.limit)
+
+        response.status(HTTP_RES_CODE.SUCCESS_CREATED).send({"message": topTotals})
+    } catch(e:any){
+        response.status(HTTP_RES_CODE.ERROR_BAD_REQUEST).send({"message":e.message});
+    }
+}
 
 
 // async function processReturnForm(req, res) {
@@ -73,4 +113,7 @@ const processSaveUser = async (request: Request, response: Response) =>  {
 export default {
     processCreateSolTransferTransaction,
     processSaveUser,
+    processSaveTransaction,
+    processGetTopSingleTransactions,
+    processGetTopTotalTransactions
 }

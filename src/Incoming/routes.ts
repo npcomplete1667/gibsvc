@@ -13,7 +13,13 @@ const router = Router()
 
 router.get('/', ((req, res) => { res.send("connected to api") }))
 router.post('/create-sol-transfer-transaction', Controller.processCreateSolTransferTransaction)
+
 router.post('/save-user', Controller.processSaveUser)
+router.post('/save-transaction', Controller.processSaveTransaction)
+
+router.post('/get-top-single-transactions', Controller.processGetTopSingleTransactions)
+router.post('/get-top-total-transactions', Controller.processGetTopTotalTransactions)
+
 
 
 

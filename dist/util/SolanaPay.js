@@ -41,7 +41,7 @@ const createSolTransferInstruction = (from_wallet, to_wallet, amount, transactio
     console.log("SolanaPay: createSolTransferInstruction from_wallet=", from_wallet, " to_wallet=", to_wallet, ", amount=", amount);
     const fromWalletPubKey = new PublicKey(from_wallet);
     const toWalletPubKey = new PublicKey(to_wallet);
-    let bnAmount = new BigNumber(amount);
+    let bnAmount = new BigNumber(amount.toFixed(10));
     const transferInstruction = SystemProgram.transfer({
         fromPubkey: fromWalletPubKey,
         lamports: bnAmount.multipliedBy(LAMPORTS_PER_SOL).toNumber(),
