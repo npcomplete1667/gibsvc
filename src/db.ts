@@ -44,6 +44,17 @@ function getPubkeyFromUsername(username:string) : Promise<[string, boolean]> {
 }
 
 
+function getUsernameFromPubkey(pubkey:string) : Promise<[string]> {
+    let query = "SELECT acc.username FROM wallet w JOIN account acc ON w.user_id = acc.id WHERE w.pubkey=$1"
+    return new Promise((resolve, reject) => {
+        pool.query(query, [pubkey], (error:Error, query_results:pg.QueryResult) => {
+            if (error) throw error;
+            resolve([query_results.rows[0]["username"]])
+        })
+    })
+}
+
+
 async function getTopSingleTransactions(to_wallet:string, txn_type:string, limit:number) : Promise<[string, string, string, number][]> {
     let query = "SELECT t.txn_hash, t.from_wallet, u.username, t.usd_amount FROM transaction t LEFT JOIN (SELECT a.username, w.pubkey FROM account a JOIN wallet w ON a.id = w.user_id) AS u ON u.pubkey=t.from_wallet WHERE t.to_wallet=$1 AND t.txn_type=$2 ORDER BY t.usd_amount DESC LIMIT $3"
     return await new Promise((resolve, reject) => {
@@ -81,6 +92,7 @@ async function getTopTotalTransactions(to_wallet:string, txn_type:string, limit:
 
 
 async function getTokenUsdPrice(token_account:string) : Promise<number> {
+    console.log("getTokenUsdPrice: token_account=",token_account)
     let query = "SELECT usd_price, cg_id, update_time FROM currency  WHERE token_account=$1"
     let [usd_price, cg_id, update_time] : [number, string, Date] = await new Promise((resolve, reject) => {
         pool.query(query, [token_account], (error:Error, query_results:pg.QueryResult) => {
@@ -88,8 +100,7 @@ async function getTokenUsdPrice(token_account:string) : Promise<number> {
             resolve([query_results.rows[0]["usd_price"], query_results.rows[0]["cg_id"], query_results.rows[0]["update_time"]])
         })
     })
-
-    if (new Date().getTime() - update_time.getTime() > 600000 || true){ //600000 = 10 minutes
+    if (update_time === undefined || new Date().getTime() - update_time.getTime() > 600000){ //600000 = 10 minutes
         const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${cg_id}&vs_currencies=usd&x_cg_demo_api_key=${process.env.COIN_GECKO_API_KEY}`);
         const data = await response.json();
         usd_price = data[cg_id]["usd"]
@@ -143,5 +154,6 @@ export default{
     sqlTransaction,
     getTokenUsdPrice,
     getTopSingleTransactions,
-    getTopTotalTransactions
+    getTopTotalTransactions,
+    getUsernameFromPubkey
 }

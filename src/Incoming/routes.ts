@@ -2,6 +2,7 @@ import { Router } from 'express'
 import Controller from './controller.js'
 // import Multer from 'multer'
 // import Query from './queries.js'
+import db from '../db.js'
 
 const router = Router()
 // const storage = Multer.memoryStorage()
@@ -19,6 +20,9 @@ router.post('/save-transaction', Controller.processSaveTransaction)
 
 router.post('/get-top-single-transactions', Controller.processGetTopSingleTransactions)
 router.post('/get-top-total-transactions', Controller.processGetTopTotalTransactions)
+router.post('/get-username-from-pubkey', Controller.processGetUsernameFromPubkey)
+
+
 
 
 

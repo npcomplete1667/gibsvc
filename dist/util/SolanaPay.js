@@ -33,7 +33,6 @@ const createSolTransferTransaction = async (from_wallet, to_wallet, amount, pay_
         // We will need the buyer to sign this transaction after it's returned to them
         requireAllSignatures: false
     });
-    console.log(transaction);
     const base64Transaction = serializedTransaction.toString('base64');
     return base64Transaction;
 };

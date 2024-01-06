@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import Controller from './controller.js';
-// import Multer from 'multer'
-// import Query from './queries.js'
 const router = Router();
 // const storage = Multer.memoryStorage()
 // const upload = Multer({ storage: storage })
@@ -14,6 +12,7 @@ router.post('/save-user', Controller.processSaveUser);
 router.post('/save-transaction', Controller.processSaveTransaction);
 router.post('/get-top-single-transactions', Controller.processGetTopSingleTransactions);
 router.post('/get-top-total-transactions', Controller.processGetTopTotalTransactions);
+router.post('/get-username-from-pubkey', Controller.processGetUsernameFromPubkey);
 // router.post('/add-user-info', upload.single('profile_image'), Query.addUserInfo);
 // router.post('/update-user-info/:user_id', upload.single('profile_image'), Query.updateUser);
 // router.get('/all-account-users', Query.getAllAccountUsers);

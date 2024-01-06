@@ -20,7 +20,6 @@ const processCreateSolTransferTransaction = async (request, response) => {
     // const transactionDescription = req.body.transactionDescription
     // add this info to the db, add the transaction description so you can write what it did
     const [to_wallet, pay_dev] = await DB.getPubkeyFromUsername(to_username);
-    console.log(to_wallet);
     const base64Transaction = await SolanaPay.createSolTransferTransaction(from_wallet, to_wallet, amount, pay_dev);
     response.status(HTTP_RES_CODE.SUCCESS_OK).send({ message: base64Transaction });
 };
@@ -72,6 +71,15 @@ const processGetTopTotalTransactions = async (request, response) => {
         response.status(HTTP_RES_CODE.ERROR_BAD_REQUEST).send({ "message": e.message });
     }
 };
+const processGetUsernameFromPubkey = async (request, response) => {
+    try {
+        const username = await DB.getUsernameFromPubkey(request.body.pubkey);
+        response.status(HTTP_RES_CODE.SUCCESS_CREATED).send({ "message": username });
+    }
+    catch (e) {
+        response.status(HTTP_RES_CODE.ERROR_BAD_REQUEST).send({ "message": e.message });
+    }
+};
 // async function processReturnForm(req, res) {
 //     console.log('Processing Return Form')
 //     const user = new Account(req);
@@ -87,5 +95,6 @@ export default {
     processSaveUser,
     processSaveTransaction,
     processGetTopSingleTransactions,
-    processGetTopTotalTransactions
+    processGetTopTotalTransactions,
+    processGetUsernameFromPubkey
 };
