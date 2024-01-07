@@ -7,7 +7,7 @@
     "build": "tsc -p tsconfig.json",
     "dev": "npm run build && dotenv -e .env.dev npx nodemon",
     "prod": "dotenv -e .env.prod npx nodemon",
-    "start": "next start",
+    "start": "node dist/server.js",
     "postinstall": "npm run typings",
     "typings": "typings install"
   },
