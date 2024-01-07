@@ -1,8 +1,0 @@
-const SUCCESS_OK = 200;
-const SUCCESS_CREATED = 201;
-const ERROR_BAD_REQUEST = 400;
-export default {
-    SUCCESS_OK,
-    SUCCESS_CREATED,
-    ERROR_BAD_REQUEST
-};
