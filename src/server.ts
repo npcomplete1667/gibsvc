@@ -21,7 +21,7 @@ app.use(urlencoded({ extended: true }))
 
 
 //this adds api in front of all the routes, you can separate that into different routes and have a different front part for better organization
-app.use('/api', Routes)
+app.use(Routes)
 
 // app.use(CookieSession(
 //     {name: 'session',
