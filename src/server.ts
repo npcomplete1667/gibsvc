@@ -1,5 +1,5 @@
 import Express, { json, urlencoded } from 'express';
-import Routes from './Incoming/routes.js'
+import Routes from './routes.js'
 import Dotenv from 'dotenv'
 import Cors from 'cors'
 // import Passport from 'passport'
@@ -39,7 +39,7 @@ app.use(Routes)
 const start = async () => {
     try {
         app.listen(PORT, () => {
-            console.log('app on ' + ip.address() + ":"+ PORT + "/api")
+            console.log('app on ' + ip.address() + ":"+ PORT)
         })
     } catch (e) {
         console.log((e as Error).message)

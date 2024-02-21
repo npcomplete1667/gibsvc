@@ -1,5 +1,6 @@
 import { Request} from 'express';
-import SchemaObject from './SchemaObject.js';
+import {SchemaObject} from './index.js';
+
 
 class Wallet implements SchemaObject{
     private pubkey:string;

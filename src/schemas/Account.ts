@@ -1,6 +1,6 @@
 import { v4 as Uuidv4 } from 'uuid';
 import { Request} from 'express';
-import SchemaObject from './SchemaObject.js';
+import {SchemaObject} from './index.js';
 
 class Account implements SchemaObject{
     private id:string;

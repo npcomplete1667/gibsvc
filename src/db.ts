@@ -1,6 +1,6 @@
 import pg from "pg"
 import pool from "./AWS/Pool.js";
-import SchemaObject from "./schemas/SchemaObject.js";
+import {SchemaObject} from "./schemas/index.js";
 import { Response} from 'express';
 import HTTP_RES_CODE from './util/httpResCodes.js'
 import Wallet from "./schemas/Wallet.js";
@@ -33,26 +33,65 @@ function checkPubkeyExists(wallet:Wallet, resp:Response) : Promise<boolean> {
     })
 }
 
-function getPubkeyFromUsername(username:string) : Promise<[string, boolean]> {
-    let query = "SELECT w.pubkey, acc.pay_dev FROM wallet w JOIN account acc ON w.user_id = acc.id WHERE acc.username=$1"
+function getPubkey(account_id:string) : Promise<string> {
+    let query = "SELECT pubkey FROM wallet WHERE account_id=$1"
     return new Promise((resolve, reject) => {
-        pool.query(query, [username], (error:Error, query_results:pg.QueryResult) => {
+        pool.query(query, [account_id], (error:Error, query_results:pg.QueryResult) => {
             if (error) throw error;
-            resolve([query_results.rows[0]["pubkey"], query_results.rows[0]["pay_dev"]])
+            if(!query_results.rowCount) reject(`Unable to get pubkey for account_id=${account_id}`);
+
+            resolve(query_results.rows[0]["pubkey"],)
+        })
+    })
+}
+
+function getPayDev(account_id:string) : Promise<boolean> {
+    let query = "SELECT pay_dev FROM account WHERE id=$1"
+    return new Promise((resolve, reject) => {
+        pool.query(query, [account_id], (error:Error, query_results:pg.QueryResult) => {
+            if (error) throw error;
+            if(!query_results.rowCount) reject(`Unable to get pay_dev for account_id=${account_id}`);
+
+            resolve(query_results.rows[0]["pubkey"],)
         })
     })
 }
 
 
-function getUsernameFromPubkey(pubkey:string) : Promise<[string]> {
-    let query = "SELECT acc.username FROM wallet w JOIN account acc ON w.user_id = acc.id WHERE w.pubkey=$1"
+function getUsername(account_id:string) : Promise<string> {
+    const query = "SELECT username FROM account WHERE id=$1"
     return new Promise((resolve, reject) => {
-        pool.query(query, [pubkey], (error:Error, query_results:pg.QueryResult) => {
+        pool.query(query, [account_id], (error:Error, query_results:pg.QueryResult) => {
             if (error) throw error;
-            resolve([query_results.rows[0]["username"]])
+            if(!query_results.rowCount) reject(`Unable to get username for account_id=${account_id}`);
+            resolve(query_results.rows[0]["username"])
         })
     })
 }
+
+function getSocialAccount(account_id:string, platform:string) : Promise<string[]> {
+    const query = "SELECT id, username, handle, image_url FROM social_account WHERE platform=$1 AND account_id=$2"
+    return new Promise((resolve, reject) => {
+        pool.query(query, [platform, account_id], (error:Error, query_results:pg.QueryResult) => {
+            if (error) throw error;
+            if(!query_results.rowCount) reject(`No Social Account found for platform=${platform}, account_id=${account_id}`);
+            console.log(query_results.rows[0])
+            resolve(query_results.rows[0])
+        })
+    })
+}
+
+// function getAccountId(pubkey:string) : Promise<string> {
+//     const query = "SELECT w.user_id from wallet w WHERE w.pubkey=$1"
+//     return new Promise((resolve, reject) => {
+//         pool.query(query, [pubkey], (error:Error, query_results:pg.QueryResult) => {
+//             if (error) throw error;
+//             if(!query_results.rowCount) reject(`Could not get user id for pubkey=${pubkey}`);
+//             resolve(query_results.rows[0]["user_id"])
+//         })
+//     })
+// }
+
 
 
 async function getTopSingleTransactions(to_wallet:string, txn_type:string, limit:number) : Promise<[string, string, string, number][]> {
@@ -97,6 +136,7 @@ async function getTokenUsdPrice(token_account:string) : Promise<number> {
     let [usd_price, cg_id, update_time] : [number, string, Date] = await new Promise((resolve, reject) => {
         pool.query(query, [token_account], (error:Error, query_results:pg.QueryResult) => {
             if (error) throw error;
+            if(!query_results.rowCount) throw Error("Unsupported Currency")
             resolve([query_results.rows[0]["usd_price"], query_results.rows[0]["cg_id"], query_results.rows[0]["update_time"]])
         })
     })
@@ -128,6 +168,7 @@ function createAddToDBQuery(input:SchemaObject) : [string, any[]] {
     return [query, Object.values(input)]
 }
 
+
 async function sqlTransaction(query_value_objects:[string, any[]][]){
     const client = await pool.connect()
     try {
@@ -149,11 +190,14 @@ async function sqlTransaction(query_value_objects:[string, any[]][]){
 export default{
     usernameExists,
     checkPubkeyExists,
-    getPubkeyFromUsername,
     createAddToDBQuery,
     sqlTransaction,
     getTokenUsdPrice,
     getTopSingleTransactions,
     getTopTotalTransactions,
-    getUsernameFromPubkey
+    getPubkey,
+    getPayDev,
+    // getAccountId,
+    getUsername,
+    getSocialAccount,
 }
